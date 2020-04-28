@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ebs-vol-a
+  labels:
+    az: eu-central-1a
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  awsElasticBlockStore:
+    volumeID: vol-0fe97cc315b9dcb55
+    fsType: ext4
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ebs-vol-b
+  labels:
+    az: eu-central-1b
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  awsElasticBlockStore:
+    volumeID: vol-0c562e06aaade552a
+    fsType: ext4

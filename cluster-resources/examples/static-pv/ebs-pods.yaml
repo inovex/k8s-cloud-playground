@@ -1,0 +1,64 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: my-ebs-app
+spec:
+  nodeName: ip-10-10-25-201.eu-central-1.compute.internal
+  containers:
+    - name: ubuntu
+      image: ubuntu
+      volumeMounts:
+      - mountPath: "/data"
+        name: my-ebs-volume
+      command: [ "sleep", "1000000" ]
+  volumes:
+    - name: my-ebs-volume
+      awsElasticBlockStore:
+        volumeID: vol-01882c67e519df52c
+        fsType: ext4
+
+---
+
+kind: Pod
+apiVersion: v1
+metadata:
+  name: my-ebs-app-b
+spec:
+  nodeSelector:
+    topology.kubernetes.io/zone: eu-central-1b
+  containers:
+    - name: ubuntu
+      image: ubuntu
+      volumeMounts:
+      - mountPath: "/data"
+        name: my-ebs-volume
+      command: [ "sleep", "1000000" ]
+  volumes:
+    - name: my-ebs-volume
+      persistentVolumeClaim:
+        claimName: ebs-vol-b
+
+---
+
+kind: Pod
+apiVersion: v1
+metadata:
+  name: my-ebs-app-master
+spec:
+  nodeSelector:
+    topology.kubernetes.io/zone: eu-central-1a
+    node-role.kubernetes.io/master: ""
+  tolerations:
+    - effect: NoSchedule
+      operator: Exists
+  containers:
+    - name: ubuntu
+      image: ubuntu
+      volumeMounts:
+      - mountPath: "/data"
+        name: my-ebs-volume
+      command: [ "sleep", "1000000" ]
+  volumes:
+    - name: my-ebs-volume
+      persistentVolumeClaim:
+        claimName: ebs-vol-a

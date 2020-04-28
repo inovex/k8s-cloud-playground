@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: es
+  labels:
+    app: elasticsearch
+  namespace: es
+spec:
+  ports:
+  - port: 9200
+    name: search
+  clusterIP: None
+  selector:
+    app: elasticsearch
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: es
+  labels:
+    app: elasticsearch
+  namespace: es
+spec:
+  selector:
+    matchLabels:
+      app: elasticsearch
+  serviceName: "es"
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      terminationGracePeriodSeconds: 20
+      #initContainers:
+      #- name:
+      containers:
+      - name: elasticsearch
+        image: ubuntu:18.04
+        command: ["sleep", "3600"]
+        env:
+          - name: "node.name"
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: "cluster.name"
+            value: k8s-tf-cluster
+          - name: "discovery.seed_hosts"
+            value: "es.es.svc"
+          - name: "cluster.initial_master_nodes"
+            value: "es-0,es-1,es-2"
+          - name: "bootstrap.memory_lock"
+            value: "true"
+          - name: ES_JAVA_OPTS
+            value: "-Xms512m -Xmx512m"
+        volumeMounts:
+        - name: data
+          mountPath: /usr/share/elasticsearch/data
+      volumes:
+        - name: data
+          emptyDir: {}
+#  volumeClaimTemplates:
+#  - metadata:
+#      name: es-data
+#    spec:
+#      accessModes: [ "ReadWriteOnce" ]
+#      storageClassName: "gp2"
+#      resources:
+#        requests:
+#          storage: 10Gi

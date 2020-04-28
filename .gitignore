@@ -1,0 +1,8 @@
+*~
+.terraform
+*.tfstate*
+do_token
+access-token
+terraform.tfvars
+join_vars.tfvars
+admin.conf

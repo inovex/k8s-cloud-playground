@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: do-csi
+spec:
+  storageClassName: do-block-storage
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: csi-app
+  name: csi-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: csi-app
+  template:
+    metadata:
+      labels:
+        app: csi-app
+    spec:
+      containers:
+      - image: ubuntu
+        name: ubuntu
+        volumeMounts:
+        - mountPath: "/data"
+          name: do-volume
+        command:
+          - bash
+          - "-c"
+          - "while :; do echo \"${HOSTNAME}: $(date)\" | tee -a /data/dates.txt; sleep 10; done"
+      volumes:
+        - name: do-volume
+          persistentVolumeClaim:
+            claimName: do-csi

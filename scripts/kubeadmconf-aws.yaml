@@ -1,0 +1,30 @@
+# https://godoc.org/k8s.io/kubernetes/cmd/kubeadm/app/apis/kubeadm/v1beta2
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: InitConfiguration
+nodeRegistration:
+  name: $${NODE_NAME}
+  kubeletExtraArgs:
+    cloud-provider: aws
+  ignorePreflightErrors:
+    - NumCPU
+
+---
+
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: ClusterConfiguration
+kubernetesVersion: v${k8s_version}
+clusterName: ${cluster_name}
+controlPlaneEndpoint: ${cp_endpoint}:6443
+apiServer:
+  extraArgs:
+    cloud-provider: aws
+controllerManager:
+  extraArgs:
+    cloud-provider: aws
+
+---
+
+# https://godoc.org/k8s.io/kubelet/config/v1beta1#KubeletConfiguration
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+featureGates: {}

@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ebs-csi-data
+spec:
+  storageClassName: ebs-csi
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ebs-csi-app
+  name: ebs-csi-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ebs-csi-app
+  template:
+    metadata:
+      labels:
+        app: ebs-csi-app
+    spec:
+      containers:
+      - image: ubuntu
+        name: ubuntu
+        volumeMounts:
+        - mountPath: "/data"
+          name: my-ebs-volume
+        command:
+          - bash
+          - "-c"
+          - "while :; do echo \"${HOSTNAME}: $(date)\" | tee -a /data/dates.txt; sleep 10; done"
+      volumes:
+        - name: my-ebs-volume
+          persistentVolumeClaim:
+            claimName: ebs-csi-data

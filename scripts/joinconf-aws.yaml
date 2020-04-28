@@ -1,0 +1,18 @@
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: JoinConfiguration
+nodeRegistration:
+  name: $${NODE_NAME}
+  kubeletExtraArgs:
+    cloud-provider: aws
+  ignorePreflightErrors:
+    - NumCPU
+discovery:
+  bootstrapToken:
+    token: ${join_token}
+    apiServerEndpoint: ${cp_endpoint}:6443
+    caCertHashes:
+      - "${cert_hash}"
+%{ if is_master ~}
+controlPlane:
+  certificateKey: ${cert_key}
+%{~ endif }
