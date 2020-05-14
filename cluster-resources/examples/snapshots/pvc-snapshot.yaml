@@ -3,7 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: ebs-snapshot-data
 spec:
-  storageClassName: ebs-csi
+  storageClassName: ebs-csi-immediate
   accessModes:
     - ReadWriteOnce
   volumeMode: Filesystem

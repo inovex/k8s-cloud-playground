@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
 - aws-ebs-csi-driver-alpha.yaml
 - storageclass.yaml
+- snapshotclass.yaml
