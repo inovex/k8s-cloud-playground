@@ -17,6 +17,24 @@ locals {
   }
 }
 
+module "ics_cluster" {
+  source = "./ics"
+
+  project_name = var.project_name
+  ssh_keys     = var.ssh_keys
+
+  kubeadmconf_file = local.kubeadmconf_file
+  joinconf_file    = local.joinconf_file
+  template_params  = local.template_params
+  init_phase       = var.init_phase
+  initial_master   = var.initial_master
+
+  admin_cidrs = var.admin_cidrs
+  masters     = local.masters
+  workers     = local.workers
+
+}
+
 # module "do_cluster" {
 #   source = "./do"
 #
