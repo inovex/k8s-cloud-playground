@@ -1,3 +1,17 @@
+# Outputs from ICS cluster
+
+output "initial_master_ip" {
+  value = module.ics_cluster.initial_master_ip
+}
+
+output "cp_endpoint_ip" {
+  value = module.ics_cluster.cp_endpoint_ip
+}
+
+output "ingress_ip" {
+  value = module.ics_cluster.ingress_ip
+}
+
 ## Outputs from DO cluster
 #
 # output "initial_master_ip" {
