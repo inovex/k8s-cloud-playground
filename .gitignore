@@ -1,6 +1,6 @@
 *~
 *.code-workspace
-.terraform
+.terraform*
 *.tfstate*
 do_token
 access-token
