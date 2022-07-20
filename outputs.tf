@@ -12,6 +12,10 @@ output "ingress_ip" {
   value = module.ics_cluster.ingress_ip
 }
 
+output "haproxycfg" {
+  value = module.ics_cluster.haproxycfg
+}
+
 ## Outputs from DO cluster
 #
 # output "initial_master_ip" {

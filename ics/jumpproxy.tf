@@ -1,4 +1,17 @@
-# INSECURE: private key is stored in TF state
+locals {
+  haproxycfg = templatefile(
+    var.haproxycfg_file,
+    {
+      api_server = var.initial_master
+      api_ip     = openstack_compute_instance_v2.master_nodes[var.initial_master].access_ip_v4
+      workers = {
+        for name, worker in openstack_compute_instance_v2.worker_nodes :
+        name => worker.access_ip_v4
+      }
+    }
+  )
+}
+
 resource "openstack_compute_instance_v2" "jumpproxy" {
   name        = "jumpproxy"
   flavor_name = local.sizes["M"]
@@ -8,23 +21,24 @@ resource "openstack_compute_instance_v2" "jumpproxy" {
   security_groups = [
     openstack_networking_secgroup_v2.external_ssh.name,
     openstack_networking_secgroup_v2.external_api.name,
+    openstack_networking_secgroup_v2.external_ingress.name,
   ]
 
   user_data = templatefile(
     "${path.root}/scripts/install_jumpproxy.sh",
     {
-      haproxycfg = templatefile(
-        var.haproxycfg_file,
-        {
-          api_server = var.initial_master
-          api_ip     = openstack_compute_instance_v2.master_nodes[var.initial_master].access_ip_v4
-        }
-      )
+      haproxycfg = local.haproxycfg
     }
   )
 
   network {
     uuid = openstack_networking_network_v2.kcp.id
+  }
+
+  lifecycle {
+    ignore_changes = [
+      user_data
+    ]
   }
 
   depends_on = [
@@ -72,4 +86,29 @@ resource "openstack_networking_secgroup_rule_v2" "external_api" {
   port_range_max    = 6443
   remote_ip_prefix  = "0.0.0.0/0"
   security_group_id = openstack_networking_secgroup_v2.external_api.id
+}
+
+resource "openstack_networking_secgroup_v2" "external_ingress" {
+  name        = "external-ingress"
+  description = "Allow external ingress"
+}
+
+resource "openstack_networking_secgroup_rule_v2" "external_http" {
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  protocol          = "tcp"
+  port_range_min    = 80
+  port_range_max    = 80
+  remote_ip_prefix  = "0.0.0.0/0"
+  security_group_id = openstack_networking_secgroup_v2.external_ingress.id
+}
+
+resource "openstack_networking_secgroup_rule_v2" "external_tls" {
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  protocol          = "tcp"
+  port_range_min    = 443
+  port_range_max    = 443
+  remote_ip_prefix  = "0.0.0.0/0"
+  security_group_id = openstack_networking_secgroup_v2.external_ingress.id
 }

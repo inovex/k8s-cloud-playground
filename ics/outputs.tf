@@ -9,3 +9,7 @@ output "cp_endpoint_ip" {
 output "ingress_ip" {
   value = openstack_networking_floatingip_v2.jumpproxy.address
 }
+
+output "haproxycfg" {
+  value = local.haproxycfg
+}
