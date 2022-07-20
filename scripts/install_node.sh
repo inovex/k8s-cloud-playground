@@ -8,45 +8,36 @@ if [ -f $${DO_RULES} ] ; then
   rm -f $${DO_RULES}
 fi
 
-# Install Docker CE (https://kubernetes.io/docs/setup/production-environment/container-runtimes/)
-## Set up the repository:
-### Install packages to allow apt to use a repository over HTTPS
-apt-get update && apt-get install -y \
-  apt-transport-https ca-certificates curl software-properties-common gnupg2
+# Install container runtime
+# https://kubernetes.io/docs/setup/production-environment/container-runtimes/
+# https://github.com/containerd/containerd/blob/main/docs/getting-started.md
 
-### Add Docker’s official GPG key
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-
-### Add Docker apt repository.
-add-apt-repository \
-  "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) \
-  stable"
-
-## Install Docker CE.
-apt-get update && apt-get install -y \
-  containerd.io=1.2.13-1 \
-  docker-ce=5:19.03.8~3-0~ubuntu-$(lsb_release -cs) \
-  docker-ce-cli=5:19.03.8~3-0~ubuntu-$(lsb_release -cs)
-
-# Setup daemon.
-cat > /etc/docker/daemon.json <<EOF
-{
-  "exec-opts": ["native.cgroupdriver=systemd"],
-  "log-driver": "json-file",
-  "log-opts": {
-    "max-size": "100m"
-  },
-  "storage-driver": "overlay2"
-}
-EOF
-
-mkdir -p /etc/systemd/system/docker.service.d
-
-# Restart docker.
+## containerd as systemd service
+wget -q https://github.com/containerd/containerd/releases/download/v1.6.6/containerd-1.6.6-linux-amd64.tar.gz
+tar Cxzvf /usr/local containerd-1.6.6-linux-amd64.tar.gz
+mkdir -p /usr/local/lib/systemd/system
+wget -q -O /usr/local/lib/systemd/system/containerd.service https://raw.githubusercontent.com/containerd/containerd/main/containerd.service
+mkdir -p /etc/containerd
+containerd config default | sed 's/SystemdCgroup = false/SystemdCgroup = true/' > /etc/containerd/config.toml
 systemctl daemon-reload
-systemctl restart docker
+systemctl enable --now containerd
 
+## runc
+wget -q -O /usr/local/sbin/runc https://github.com/opencontainers/runc/releases/download/v1.1.3/runc.amd64
+chmod a+x /usr/local/sbin/runc
+
+## CNI plugins
+wget -q https://github.com/containernetworking/plugins/releases/download/v1.1.1/cni-plugins-linux-amd64-v1.1.1.tgz
+mkdir -p /opt/cni/bin
+tar Cxzvf /opt/cni/bin cni-plugins-linux-amd64-v1.1.1.tgz
+
+## nerdctl (optional)
+wget -q https://github.com/containerd/nerdctl/releases/download/v0.22.0/nerdctl-0.22.0-linux-amd64.tar.gz
+tar Cxzvf /usr/local/bin nerdctl-0.22.0-linux-amd64.tar.gz
+
+# Configure kernel
+modprobe br_netfilter
+echo '1' > /proc/sys/net/ipv4/ip_forward
 
 # Install K8s
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -

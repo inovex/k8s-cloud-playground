@@ -1,3 +1,3 @@
 terraform {
-# Configure state storage here if required.
+  # Configure state storage here if required.
 }

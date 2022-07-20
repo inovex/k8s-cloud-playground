@@ -4,6 +4,7 @@
 *.tfstate*
 do_token
 access-token
+clouds.yaml
 terraform.tfvars
 join_vars.tfvars
 admin.conf
