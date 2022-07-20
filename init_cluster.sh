@@ -12,10 +12,11 @@ done
 
 INITIAL_MASTER_IP=$(terraform output --raw initial_master_ip)
 echo "Initial Master IP: ${INITIAL_MASTER_IP}"
+PROXY_JUMP="-oProxyJump=${SSH_USER}@$(terraform output --raw cp_endpoint_ip)"
 
 echo "Retrieving config from initial master."
-scp ${SSH_USER}@${INITIAL_MASTER_IP}:/admin.conf .
-scp ${SSH_USER}@${INITIAL_MASTER_IP}:/join_vars.tfvars .
+scp ${PROXY_JUMP} ${SSH_USER}@${INITIAL_MASTER_IP}:/admin.conf .
+scp ${PROXY_JUMP} ${SSH_USER}@${INITIAL_MASTER_IP}:/join_vars.tfvars .
 
 echo "Installing Weave networking."
 kubectl --kubeconfig admin.conf apply \

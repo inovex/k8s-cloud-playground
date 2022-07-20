@@ -37,31 +37,24 @@ resource "openstack_compute_instance_v2" "master_nodes" {
 
 }
 
-resource "openstack_compute_floatingip_associate_v2" "master" {
-  floating_ip = openstack_networking_floatingip_v2.master.address
-  instance_id = openstack_compute_instance_v2.master_nodes[var.initial_master].id
-}
-
 resource "openstack_networking_secgroup_v2" "allow_ssh" {
   name        = "allow-ssh"
-  description = "Allow SSH access"
+  description = "Allow SSH access from jumpproxy"
 }
 
 resource "openstack_networking_secgroup_rule_v2" "allow_ssh" {
-  count = length(var.admin_cidrs)
-
   direction         = "ingress"
   ethertype         = "IPv4"
   protocol          = "tcp"
   port_range_min    = 22
   port_range_max    = 22
-  remote_ip_prefix  = var.admin_cidrs[count.index]
+  remote_group_id   = openstack_networking_secgroup_v2.external_ssh.id
   security_group_id = openstack_networking_secgroup_v2.allow_ssh.id
 }
 
 resource "openstack_networking_secgroup_v2" "allow_api" {
   name        = "allow-api"
-  description = "Allow K8s API access"
+  description = "Allow K8s API access from jumpproxy"
 }
 
 resource "openstack_networking_secgroup_rule_v2" "allow_api" {
@@ -70,7 +63,7 @@ resource "openstack_networking_secgroup_rule_v2" "allow_api" {
   protocol          = "tcp"
   port_range_min    = 6443
   port_range_max    = 6443
-  remote_ip_prefix  = "0.0.0.0/0"
+  remote_group_id   = openstack_networking_secgroup_v2.external_api.id
   security_group_id = openstack_networking_secgroup_v2.allow_api.id
 }
 
@@ -83,8 +76,6 @@ resource "openstack_networking_secgroup_rule_v2" "internal_tcp" {
   direction         = "ingress"
   ethertype         = "IPv4"
   protocol          = "tcp"
-  port_range_min    = 1
-  port_range_max    = 65535
   remote_group_id   = openstack_networking_secgroup_v2.cluster_internal.id
   security_group_id = openstack_networking_secgroup_v2.cluster_internal.id
 }
@@ -93,8 +84,6 @@ resource "openstack_networking_secgroup_rule_v2" "internal_udp" {
   direction         = "ingress"
   ethertype         = "IPv4"
   protocol          = "udp"
-  port_range_min    = 1
-  port_range_max    = 65535
   remote_group_id   = openstack_networking_secgroup_v2.cluster_internal.id
   security_group_id = openstack_networking_secgroup_v2.cluster_internal.id
 }

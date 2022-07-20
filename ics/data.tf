@@ -22,7 +22,7 @@ locals {
   template_params = merge(
     var.template_params,
     {
-      cp_endpoint = openstack_networking_floatingip_v2.master.address
+      cp_endpoint = openstack_networking_floatingip_v2.jumpproxy.address
     }
   )
 }

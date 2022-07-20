@@ -21,6 +21,11 @@ variable "joinconf_file" {
   description = "Full path to the joinconf template file."
 }
 
+variable "haproxycfg_file" {
+  type        = string
+  description = "Full path to the haproxy.cfg template file."
+}
+
 variable "template_params" {
   type        = map(string)
   description = "Common parameters for templating the kubeadmconf and joinconf."

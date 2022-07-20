@@ -21,7 +21,3 @@ resource "openstack_networking_router_interface_v2" "kcp" {
   router_id = openstack_networking_router_v2.kcp.id
   subnet_id = openstack_networking_subnet_v2.kcp.id
 }
-
-resource "openstack_networking_floatingip_v2" "master" {
-  pool = "public"
-}

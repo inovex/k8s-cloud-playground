@@ -4,6 +4,7 @@ locals {
 
   kubeadmconf_file = "${path.root}/scripts/kubeadmconf-${var.kubeadmconf}.yaml"
   joinconf_file    = "${path.root}/scripts/joinconf-${var.kubeadmconf}.yaml"
+  haproxycfg_file  = "${path.root}/scripts/haproxy.cfg"
 
   template_params = {
     provider     = split("-", var.kubeadmconf)[0]
@@ -25,6 +26,7 @@ module "ics_cluster" {
 
   kubeadmconf_file = local.kubeadmconf_file
   joinconf_file    = local.joinconf_file
+  haproxycfg_file  = local.haproxycfg_file
   template_params  = local.template_params
   init_phase       = var.init_phase
   initial_master   = var.initial_master
