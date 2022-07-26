@@ -1,7 +1,7 @@
 resource "openstack_networking_network_v2" "kcp" {
   name           = "kcp"
   admin_state_up = "true"
-  dns_domain     = "fra.ics.${var.project_name}.inovex.io."
+  dns_domain     = "${var.project_name}.fra.ics.inovex.io."
 }
 
 resource "openstack_networking_subnet_v2" "kcp" {
