@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/usages: "key agreement,digital signature,server auth"
+  name: demo1
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: demo1.heggers.fra.ics.inovex.io
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: demo1
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - demo1.heggers.fra.ics.inovex.io
+    secretName: demo1-ingress-tls

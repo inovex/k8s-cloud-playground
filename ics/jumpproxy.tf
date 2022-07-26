@@ -44,7 +44,6 @@ resource "openstack_compute_instance_v2" "jumpproxy" {
   depends_on = [
     openstack_networking_router_interface_v2.kcp,
   ]
-
 }
 
 resource "openstack_networking_floatingip_v2" "jumpproxy" {
@@ -59,6 +58,14 @@ resource "openstack_compute_floatingip_associate_v2" "jumpproxy" {
 resource "openstack_networking_secgroup_v2" "external_ssh" {
   name        = "external-ssh"
   description = "Allow SSH access"
+}
+
+resource "openstack_dns_recordset_v2" "wildcard_rs" {
+  zone_id = data.openstack_dns_zone_v2.dns_zone.id
+  name    = "*.${local.dns_domain}."
+  ttl     = 3000
+  type    = "A"
+  records = [openstack_networking_floatingip_v2.jumpproxy.address]
 }
 
 resource "openstack_networking_secgroup_rule_v2" "external_ssh" {

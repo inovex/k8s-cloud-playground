@@ -13,12 +13,16 @@ data "openstack_networking_network_v2" "public" {
   name = "public"
 }
 
+data "openstack_dns_zone_v2" "dns_zone" {
+  name = "${local.dns_domain}."
+}
+
 locals {
   sizes = {
     "S" = "t2.micro"
     "M" = "c4.large"
   }
-
+  dns_domain = "${var.project_name}.fra.ics.inovex.io"
   template_params = merge(
     var.template_params,
     {
