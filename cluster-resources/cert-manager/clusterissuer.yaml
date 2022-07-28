@@ -4,7 +4,7 @@ metadata:
   name: letsencrypt-staging
 spec:
   acme:
-    email: heggers@inovex.de
+    email: LE_ACCOUNT_EMAIL
     server: https://acme-staging-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       name: letsencrypt-staging-key
@@ -19,9 +19,8 @@ kind: ClusterIssuer
 metadata:
   name: letsencrypt-prod
 spec:
-  keyUsage: any
   acme:
-    email: heggers@inovex.de
+    email: LE_ACCOUNT_EMAIL
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       name: letsencrypt-prod-key

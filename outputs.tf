@@ -16,6 +16,10 @@ output "haproxycfg" {
   value = module.ics_cluster.haproxycfg
 }
 
+output "dns_domain" {
+  value = module.ics_cluster.dns_domain
+}
+
 ## Outputs from DO cluster
 #
 # output "initial_master_ip" {

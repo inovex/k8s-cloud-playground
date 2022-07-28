@@ -11,10 +11,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - "dashboard.heggers.fra.ics.inovex.io"
+        - "dashboard.DNS_DOMAIN"
       secretName: dashboard-tls
   rules:
-    - host: "dashboard.heggers.fra.ics.inovex.io"
+    - host: "dashboard.DNS_DOMAIN"
       http:
         paths:
           - path: /

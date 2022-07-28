@@ -1,3 +1,4 @@
+project_name = "heggers"         # The project name (for ICS)
 ssh_keys    = ["my-key"]         # Name of your pre-uploaded SSH key.
 admin_cidrs = ["123.123.0.0/16"] # The CIDR that YOU access the cluster from.
 
@@ -7,25 +8,25 @@ kubeadmconf    = "default" # Variants of how to deploy the cluster.
 
 masters = {
   "alpha" = {
-    size = "S"
+    size = "M"
   }
-  "bravo" = {
-    size = "S"
-  }
-  "charlie" = {
-    size = "S"
-  }
+#  "bravo" = {
+#    size = "M"
+#  }
+#  "charlie" = {
+#    size = "M"
+#  }
 }
 
 workers = {
   "delta" = {
-    size = "S"
+    size = "M"
   }
   "echo" = {
-    size = "S"
+    size = "M"
   }
   "foxtrott" = {
-    size = "S"
+    size = "M"
   }
 }
 # https://en.wikipedia.org/wiki/Allied_military_phonetic_spelling_alphabets

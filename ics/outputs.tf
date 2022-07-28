@@ -13,3 +13,7 @@ output "ingress_ip" {
 output "haproxycfg" {
   value = local.haproxycfg
 }
+
+output "dns_domain" {
+  value = local.dns_domain
+}
