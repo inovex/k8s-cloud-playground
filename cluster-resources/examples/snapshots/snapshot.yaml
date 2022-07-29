@@ -1,8 +1,8 @@
-apiVersion: snapshot.storage.k8s.io/v1beta1
+apiVersion: snapshot.storage.k8s.io/v1
 kind: VolumeSnapshot
 metadata:
-  name: ebs-csi-volume
+  name: cinder-demo-vol-1
 spec:
-  volumeSnapshotClassName: ebs-csi
+  volumeSnapshotClassName: cinder-block-storage
   source:
-    persistentVolumeClaimName: ebs-csi-data
+    persistentVolumeClaimName: cinder-demo-vol

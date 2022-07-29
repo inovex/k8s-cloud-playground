@@ -1,14 +1,19 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: snapshot-controller
   namespace: kube-system
 spec:
-  replicas: 1
+  minReadySeconds: 15
+  replicas: 2
   selector:
     matchLabels:
       app: snapshot-controller
-  serviceName: snapshot-controller
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -17,7 +22,8 @@ spec:
       containers:
       - args:
         - --v=5
-        - --leader-election=false
-        image: quay.io/k8scsi/snapshot-controller:v2.0.1
+        - --leader-election=true
+        image: gcr.io/k8s-staging-sig-storage/snapshot-controller:v6.0.1
+        imagePullPolicy: IfNotPresent
         name: snapshot-controller
-      serviceAccount: snapshot-controller
+      serviceAccountName: snapshot-controller

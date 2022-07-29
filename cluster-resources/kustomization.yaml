@@ -7,3 +7,4 @@ resources:
 - metrics-server/
 - dashboard/
 - csi-cinder/
+- snapshot-controller/
