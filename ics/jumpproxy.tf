@@ -2,8 +2,10 @@ locals {
   haproxycfg = templatefile(
     var.haproxycfg_file,
     {
-      api_server = var.initial_master
-      api_ip     = openstack_compute_instance_v2.master_nodes[var.initial_master].access_ip_v4
+      masters = {
+        for name, master in openstack_compute_instance_v2.master_nodes :
+        name => master.access_ip_v4
+      }
       workers = {
         for name, worker in openstack_compute_instance_v2.worker_nodes :
         name => worker.access_ip_v4
