@@ -12,6 +12,10 @@ locals {
       }
     }
   )
+  external_api_cidrs = concat(
+    var.admin_cidrs,
+    ["${openstack_networking_router_v2.kcp.external_fixed_ip[0].ip_address}/32"],
+  )
 }
 
 resource "openstack_compute_instance_v2" "jumpproxy" {
@@ -88,12 +92,14 @@ resource "openstack_networking_secgroup_v2" "external_api" {
 }
 
 resource "openstack_networking_secgroup_rule_v2" "external_api" {
+  count = length(local.external_api_cidrs)
+
   direction         = "ingress"
   ethertype         = "IPv4"
   protocol          = "tcp"
   port_range_min    = 6443
   port_range_max    = 6443
-  remote_ip_prefix  = "0.0.0.0/0"
+  remote_ip_prefix  = local.external_api_cidrs[count.index]
   security_group_id = openstack_networking_secgroup_v2.external_api.id
 }
 
